@@ -40,7 +40,7 @@ State sync allows you to quickly sync from a recent snapshot instead of syncing 
 ```bash
 # 1. Install republicd binary
 VERSION="v0.1.0"
-curl -L "https://raw.githubusercontent.com/RepublicAI/networks/main/testnet/releases/${VERSION}/republicd-linux-amd64" -o /tmp/republicd
+curl -L "https://media.githubusercontent.com/media/RepublicAI/networks/main/testnet/releases/${VERSION}/republicd-linux-amd64" -o /tmp/republicd
 chmod +x /tmp/republicd
 sudo mv /tmp/republicd /usr/local/bin/republicd
 
@@ -74,7 +74,7 @@ republicd start
 ```bash
 # 1. Install republicd binary
 VERSION="v0.1.0"
-curl -L "https://raw.githubusercontent.com/RepublicAI/networks/main/testnet/releases/${VERSION}/republicd-linux-amd64" -o /tmp/republicd
+curl -L "https://media.githubusercontent.com/media/RepublicAI/networks/main/testnet/releases/${VERSION}/republicd-linux-amd64" -o /tmp/republicd
 chmod +x /tmp/republicd
 sudo mv /tmp/republicd /usr/local/bin/republicd
 
