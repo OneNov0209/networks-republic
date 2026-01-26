@@ -238,5 +238,5 @@ sudo systemctl start republicd
 
 ## Support
 
-- GitHub Issues: https://github.com/AizelNetwork/republic-protocol/issues
+- GitHub Issues: https://github.com/RepublicAI/networks/issues
 - Discord: Coming Soon
