@@ -18,7 +18,7 @@ This repository contains network configurations for RepublicAI Protocol chains.
 - **gRPC**: grpc.republicai.io:443
 - **EVM JSON-RPC**: https://evm-rpc.republicai.io
 - **Points Portal**: https://points.republicai.io
-- **Testnet Faucet (Points)**: https://points.republicai.io/faucet
+- **Testnet Faucet**: Available via the Points portal (account required)
 
 
 ## Resources
