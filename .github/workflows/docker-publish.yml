@@ -1,0 +1,89 @@
+name: Docker Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build (e.g. v0.3.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            echo "version=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p binaries
+          gh release download "${{ steps.tag.outputs.version }}" \
+            --repo ${{ github.repository }} \
+            --pattern "republicd-linux-*" \
+            --dir binaries
+          ls -lh binaries/
+
+      - name: Create Dockerfile
+        run: |
+          cat > binaries/Dockerfile <<'EOF'
+          FROM ubuntu:24.04
+
+          ARG TARGETARCH
+
+          RUN apt-get update && apt-get install -y \
+              ca-certificates \
+              && rm -rf /var/lib/apt/lists/*
+
+          COPY republicd-linux-${TARGETARCH:-amd64} /usr/local/bin/republicd
+          RUN chmod +x /usr/local/bin/republicd
+
+          RUN useradd -m -s /bin/bash republic
+          USER republic
+          WORKDIR /home/republic
+
+          ENV HOME=/home/republic
+          ENV REPUBLIC_HOME=/home/republic/.republic
+
+          EXPOSE 26656
+
+          ENTRYPOINT ["republicd"]
+          CMD ["start", "--home", "/home/republic/.republic"]
+          EOF
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: binaries
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/republicd:${{ steps.tag.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/republicd:latest
